@@ -161,3 +161,38 @@ function createNavitimeUrl(from, to, date, searchType, through) {
   }
   return `${NAVITIME_BASE_URL}?${queryParts.join('&')}`;
 }
+
+/**
+ * LINEからメッセージが来たときに動く関数 (Webhook)
+ * 送ってきた相手に、その人のユーザーIDを返信します。
+ */
+function doPost(e) {
+  const json = JSON.parse(e.postData.contents);
+  const event = json.events[0];
+  
+  // 返信用のトークンと、相手のユーザーID
+  const replyToken = event.replyToken;
+  const userId = event.source.userId;
+  
+  // 返信するメッセージ
+  const message = `あなたのIDはこちらです:\n${userId}\n\nこのIDをスプレッドシートに書き込んでください。`;
+  
+  const url = 'https://api.line.me/v2/bot/message/reply';
+  const options = {
+    'headers': {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ' + PropertiesService.getScriptProperties().getProperty('LINE_CHANNEL_TOKEN'),
+    },
+    'method': 'post',
+    'payload': JSON.stringify({
+      'replyToken': replyToken,
+      'messages': [{
+        'type': 'text',
+        'text': message,
+      }],
+    }),
+  };
+  
+  UrlFetchApp.fetch(url, options);
+  return ContentService.createTextOutput(JSON.stringify({'content': 'post ok'})).setMimeType(ContentService.MimeType.JSON);
+}
