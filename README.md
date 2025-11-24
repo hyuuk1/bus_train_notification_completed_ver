@@ -1,1 +1,2 @@
 # bus_train_notification_completed_ver
+環境変数(application properties)に指定してあるスプレッドシートにline ID、出発駅、到着駅、曜日時間などを書き込むと、gasがそれを読み取り、LINE BOTがメッセージでnavitimeの検索のURLを送ってくれます。
